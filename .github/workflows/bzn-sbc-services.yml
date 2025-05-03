@@ -3,7 +3,7 @@ on:
   pull_request:
     paths:
       - 'app/**'
-      - '.github/workflows/pipeline-build-deploy.yml'   
+      - '.github/workflows/bzn-sbc-services.yml'   
     branches:
       - 'main'
       - 'develop'
@@ -12,7 +12,7 @@ on:
   push:
     paths:
       - 'app/**'
-      - '.github/workflows/pipeline-build-deploy.yml'  
+      - '.github/workflows/bzn-sbc-services.yml'  
     branches:
       - 'main'    
   workflow_dispatch:

@@ -1,4 +1,4 @@
-name: Pipeline Build and Deploy
+name: Pipeline Build and Deploy [SBC]
 on:
   pull_request:
     paths:
@@ -29,7 +29,7 @@ env:
   REGISTRY_DOCKER: ghcr.io
   REPOSITORY_DOCKER: ${{ github.repository }}
   VERSION_TYPE: ''
-  APP: cos
+  APP: sbc
 jobs:
   info-environment:
     name: Identifying the Environment

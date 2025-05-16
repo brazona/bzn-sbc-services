@@ -33,3 +33,7 @@ build/
 .vscode/
 
 /src/main/resources/log/**
+/src/main/resources/cert/**
+
+*.crt
+*.p12

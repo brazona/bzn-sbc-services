@@ -24,17 +24,16 @@ ENV APP_SERVER_PORT_EXT=$ARG_APP_SERVER_PORT_EXT
 ENV APP_SERVER_CERTIFICATE=$ARG_APP_SERVER_CERTIFICATE
 ENV APP_SERVER_CERTIFICATE_ALIAS=$ARG_APP_SERVER_CERTIFICATE_ALIAS
 
-
 # Define o diretório de trabalho dentro do contêiner
-WORKDIR /temporary
+WORKDIR /app
 
 # Copia o arquivo pom.xml e os arquivos de dependências para o diretório de trabalho
-COPY pom.xml ./temporary
-COPY $APP_SERVER_CERTIFICATE ./temporary
-COPY /src ./temporary/src
+COPY pom.xml ./
+COPY $APP_SERVER_CERTIFICATE ./
+COPY src ./app/src
 
 # Compila a aplicação
-RUN mvn clean install
+RUN mvn clean install -P $SPRING_ACTIVE_PROFILE
 
 # Etapa 2: Criar a imagem final para execução
 FROM openjdk:24-slim
@@ -47,12 +46,10 @@ ARG JAR_FILE=target/*.jar
 # Cria um argumento para o nome do certificado
 ENV JAVA_HOME=/usr/lib/jvm/openjdk:24-slim
 
+RUN keytool -importcert -file $APP_SERVER_CERTIFICATE -alias $APP_SERVER_CERTIFICATE_ALIAS -keystore $JAVA_HOME/lib/security/cacerts -storepass changeit -noprompt
 # Copia o jar compilado da etapa anterior
 COPY --from=build /app/${JAR_FILE} app.jar
-# Copia o jar compilado da etapa anterior
-COPY --from=build /app/$APP_SERVER_CERTIFICATE ./
 
-RUN keytool -importcert -file $APP_SERVER_CERTIFICATE -alias $APP_SERVER_CERTIFICATE_ALIAS -keystore $JAVA_HOME/lib/security/cacerts -storepass changeit -noprompt
 # Expõe a porta da aplicação
 EXPOSE $APP_SERVER_PORT_EXT
 

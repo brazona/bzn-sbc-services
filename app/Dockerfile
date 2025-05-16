@@ -26,17 +26,12 @@ ENV APP_SERVER_CERTIFICATE_ALIAS=$ARG_APP_SERVER_CERTIFICATE_ALIAS
 
 
 # Define o diretório de trabalho dentro do contêiner
-WORKDIR /app
-
-# Copy the current directory contents into the container at /app
-# COPY . /app
+WORKDIR /temporary
 
 # Copia o arquivo pom.xml e os arquivos de dependências para o diretório de trabalho
-COPY pom.xml ./app
-COPY src ./app/src
-# COPY pom.xml ./app
-# COPY src ./app/src
-COPY $APP_SERVER_CERTIFICATE ./app
+COPY pom.xml ./temporary
+COPY $APP_SERVER_CERTIFICATE ./temporary
+COPY /src ./temporary/src
 
 # Compila a aplicação
 RUN mvn clean install
@@ -45,15 +40,16 @@ RUN mvn clean install
 FROM openjdk:24-slim
 
 # Define o diretório de trabalho dentro do contêiner
-#WORKDIR /app
+WORKDIR /app
 
 # Cria um argumento para o nome da aplicação
 ARG JAR_FILE=target/*.jar
-
+# Cria um argumento para o nome do certificado
 ENV JAVA_HOME=/usr/lib/jvm/openjdk:24-slim
 
 # Copia o jar compilado da etapa anterior
 COPY --from=build /app/${JAR_FILE} app.jar
+# Copia o jar compilado da etapa anterior
 COPY --from=build /app/$APP_SERVER_CERTIFICATE ./
 
 RUN keytool -importcert -file $APP_SERVER_CERTIFICATE -alias $APP_SERVER_CERTIFICATE_ALIAS -keystore $JAVA_HOME/lib/security/cacerts -storepass changeit -noprompt

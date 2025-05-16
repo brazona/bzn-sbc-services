@@ -32,8 +32,10 @@ WORKDIR /app
 # COPY . /app
 
 # Copia o arquivo pom.xml e os arquivos de dependências para o diretório de trabalho
-COPY pom.xml ./app
+COPY pom.xml ./
 COPY src ./app/src
+# COPY pom.xml ./app
+# COPY src ./app/src
 COPY $APP_SERVER_CERTIFICATE ./app
 
 # Compila a aplicação

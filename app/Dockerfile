@@ -45,7 +45,7 @@ RUN mvn clean install
 FROM openjdk:24-slim
 
 # Define o diretório de trabalho dentro do contêiner
-WORKDIR /app
+#WORKDIR /app
 
 # Cria um argumento para o nome da aplicação
 ARG JAR_FILE=target/*.jar

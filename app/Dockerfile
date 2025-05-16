@@ -4,15 +4,15 @@ FROM maven:3.9.9-sapmachine-24 AS build
 LABEL maintainer=Brazona\ Cézar
 VOLUME /tmp
 
-ARG ARG_SPRING_ACTIVE_PROFILE
+ARG ARG_SPRING_ACTIVE_PROFILE=compose
 ARG ARG_APPLICATION_NAME
 ARG ARG_CONFIG_SERVER_PASS
 ARG ARG_CONFIG_SERVER_USER
 ARG ARG_CONFIG_SERVER_HOST
 ARG ARG_APP_SERVER_PORT_INT
 ARG ARG_APP_SERVER_PORT_EXT
-ARG ARG_APP_SERVER_CERTIFICATE
-ARG ARG_APP_SERVER_CERTIFICATE_ALIAS
+ARG ARG_APP_SERVER_CERTIFICATE==./bzn-sbc-client-compose.crt   
+ARG ARG_APP_SERVER_CERTIFICATE_ALIAS=bzn-sbc-server-compose
 
 ENV SPRING_ACTIVE_PROFILE=$ARG_SPRING_ACTIVE_PROFILE
 ENV APPLICATION_NAME=$ARG_APPLICATION_NAME
@@ -45,7 +45,8 @@ WORKDIR /app
 ARG JAR_FILE=target/*.jar
 # Cria um argumento para o nome do certificado
 ENV JAVA_HOME=/usr/lib/jvm/openjdk:24-slim
-
+# Copia o jar compilado da etapa anterior
+COPY --from=build /app/$APP_SERVER_CERTIFICATE .
 RUN keytool -importcert -file $APP_SERVER_CERTIFICATE -alias $APP_SERVER_CERTIFICATE_ALIAS -keystore $JAVA_HOME/lib/security/cacerts -storepass changeit -noprompt
 # Copia o jar compilado da etapa anterior
 COPY --from=build /app/${JAR_FILE} app.jar

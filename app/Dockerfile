@@ -23,7 +23,7 @@ ENV APP_SERVER_PORT_INT=$ARG_APP_SERVER_PORT_INT
 ENV APP_SERVER_PORT_EXT=$ARG_APP_SERVER_PORT_EXT
 ENV APP_SERVER_CERTIFICATE=$ARG_APP_SERVER_CERTIFICATE
 ENV APP_SERVER_CERTIFICATE_ALIAS=$ARG_APP_SERVER_CERTIFICATE_ALIAS
-ENV JAVA_HOME=/usr/lib/jvm/openjdk:24-slim
+
 
 # Define o diretório de trabalho dentro do contêiner
 WORKDIR /app
@@ -49,6 +49,8 @@ WORKDIR /app
 
 # Cria um argumento para o nome da aplicação
 ARG JAR_FILE=target/*.jar
+
+ENV JAVA_HOME=/usr/lib/jvm/openjdk:24-slim
 
 # Copia o jar compilado da etapa anterior
 COPY --from=build /app/${JAR_FILE} app.jar

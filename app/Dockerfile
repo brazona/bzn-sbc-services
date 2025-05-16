@@ -32,7 +32,7 @@ WORKDIR /app
 # COPY . /app
 
 # Copia o arquivo pom.xml e os arquivos de dependências para o diretório de trabalho
-COPY pom.xml ./
+COPY pom.xml ./app
 COPY src ./app/src
 # COPY pom.xml ./app
 # COPY src ./app/src
@@ -54,7 +54,8 @@ ENV JAVA_HOME=/usr/lib/jvm/openjdk:24-slim
 
 # Copia o jar compilado da etapa anterior
 COPY --from=build /app/${JAR_FILE} app.jar
-COPY --from=build /app/$APP_SERVER_CERTIFICATE .
+COPY --from=build /app/$APP_SERVER_CERTIFICATE ./
+
 RUN keytool -importcert -file $APP_SERVER_CERTIFICATE -alias $APP_SERVER_CERTIFICATE_ALIAS -keystore $JAVA_HOME/lib/security/cacerts -storepass changeit -noprompt
 # Expõe a porta da aplicação
 EXPOSE $APP_SERVER_PORT_EXT

@@ -36,8 +36,8 @@ RUN mvn clean install -P $SPRING_ACTIVE_PROFILE
 # Etapa 2: Criar a imagem final para execução
 FROM openjdk:24-slim
 
-ARG ARG_APP_SERVER_CERTIFICATE bzn-sbc-client-compose.crt   
-ARG ARG_APP_SERVER_CERTIFICATE_ALIAS bzn-sbc-server-compose
+ARG ARG_APP_SERVER_CERTIFICATE=bzn-sbc-client-compose.crt   
+ARG ARG_APP_SERVER_CERTIFICATE_ALIAS=bzn-sbc-server-compose
 
 ENV APP_SERVER_CERTIFICATE=$ARG_APP_SERVER_CERTIFICATE
 ENV APP_SERVER_CERTIFICATE_ALIAS=$ARG_APP_SERVER_CERTIFICATE_ALIAS
@@ -47,11 +47,12 @@ WORKDIR /app
 
 # Cria um argumento para o nome da aplicação
 ARG JAR_FILE=target/*.jar
-# Cria um argumento para o nome do certificado
-ENV JAVA_HOME=/usr/lib/jvm/openjdk:24-slim
+
+#ENV JAVA_CACERTS=/usr/lib/jvm/openjdk:24-slim/lib/security/cacerts
+ENV JAVA_CACERTS==/usr/lib/jvm/openjdk:24-slim/jre/lib/security/cacerts
 # Copia o jar compilado da etapa anterior
 COPY --from=build /app/$APP_SERVER_CERTIFICATE .
-RUN keytool -importcert -file $APP_SERVER_CERTIFICATE -alias $APP_SERVER_CERTIFICATE_ALIAS -keystore $JAVA_HOME/lib/security/cacerts -storepass changeit -noprompt
+RUN keytool -importcert -file $APP_SERVER_CERTIFICATE -alias $APP_SERVER_CERTIFICATE_ALIAS -keystore $JAVA_CACERTS -storepass changeit -noprompt
 # Copia o jar compilado da etapa anterior
 COPY --from=build /app/${JAR_FILE} app.jar
 

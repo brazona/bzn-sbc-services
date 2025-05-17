@@ -27,7 +27,7 @@ WORKDIR /app
 # Copia o arquivo pom.xml e os arquivos de dependências para o diretório de trabalho
 COPY pom.xml ./
 COPY src ./src
-                                                                      /
+
 # Compila a aplicação
 RUN mvn clean install -P $SPRING_ACTIVE_PROFILE
 

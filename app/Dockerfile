@@ -5,6 +5,7 @@ LABEL maintainer=Brazona\ Cézar
 VOLUME /tmp
 
 ARG ARG_SPRING_ACTIVE_PROFILE=compose
+ARG ARG_APP_SERVER_CERTIFICATE=bzn-sbc-server-compose.p12
 ARG ARG_APPLICATION_NAME
 ARG ARG_CONFIG_SERVER_PASS
 ARG ARG_CONFIG_SERVER_USER
@@ -22,25 +23,21 @@ ENV APP_SERVER_PORT_INT=$ARG_APP_SERVER_PORT_INT
 ENV APP_SERVER_PORT_EXT=$ARG_APP_SERVER_PORT_EXT
 
 
+ENV APP_SERVER_CERTIFICATE=$ARG_APP_SERVER_CERTIFICATE
+
+
 # Define o diretório de trabalho dentro do contêiner
 WORKDIR /app
 
 # Copia o arquivo pom.xml e os arquivos de dependências para o diretório de trabalho
 COPY pom.xml ./
-COPY $APP_SERVER_CERTIFICATE ./
 COPY src ./app/src
-
+COPY $APP_SERVER_CERTIFICATE ./app/src/main/resources                                                                         /
 # Compila a aplicação
 RUN mvn clean install -P $SPRING_ACTIVE_PROFILE
 
 # Etapa 2: Criar a imagem final para execução
 FROM openjdk:24-slim
-
-ARG ARG_APP_SERVER_CERTIFICATE=bzn-sbc-client-compose.crt   
-ARG ARG_APP_SERVER_CERTIFICATE_ALIAS=bzn-sbc-server-compose
-
-ENV APP_SERVER_CERTIFICATE=$ARG_APP_SERVER_CERTIFICATE
-ENV APP_SERVER_CERTIFICATE_ALIAS=$ARG_APP_SERVER_CERTIFICATE_ALIAS
 
 # Define o diretório de trabalho dentro do contêiner
 WORKDIR /app
@@ -48,11 +45,6 @@ WORKDIR /app
 # Cria um argumento para o nome da aplicação
 ARG JAR_FILE=target/*.jar
 
-#ENV JAVA_CACERTS=/usr/lib/jvm/openjdk:24-slim/lib/security/cacerts
-ENV JAVA_CACERTS==/usr/lib/jvm/openjdk:24-slim/jre/lib/security/cacerts
-# Copia o jar compilado da etapa anterior
-COPY --from=build /app/$APP_SERVER_CERTIFICATE .
-RUN keytool -importcert -file $APP_SERVER_CERTIFICATE -alias $APP_SERVER_CERTIFICATE_ALIAS -keystore $JAVA_CACERTS -storepass changeit -noprompt
 # Copia o jar compilado da etapa anterior
 COPY --from=build /app/${JAR_FILE} app.jar
 

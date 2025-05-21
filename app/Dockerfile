@@ -4,8 +4,7 @@ FROM maven:3.9.9-sapmachine-24 AS build
 LABEL maintainer=Brazona\ Cézar
 VOLUME /tmp
 
-ARG ARG_SPRING_ACTIVE_PROFILE=compose
-ARG ARG_APP_SERVER_CERTIFICATE=bzn-sbc-server-compose.p12
+ARG ARG_SPRING_ACTIVE_PROFILE
 ARG ARG_APPLICATION_NAME
 ARG ARG_CONFIG_SERVER_PASS
 ARG ARG_CONFIG_SERVER_USER
@@ -20,7 +19,7 @@ ENV CONFIG_SERVER_USER=$ARG_CONFIG_SERVER_USER
 ENV CONFIG_SERVER_HOST=$ARG_CONFIG_SERVER_HOST
 ENV APP_SERVER_PORT_INT=$ARG_APP_SERVER_PORT_INT
 ENV APP_SERVER_PORT_EXT=$ARG_APP_SERVER_PORT_EXT
-ENV APP_SERVER_CERTIFICATE=$ARG_APP_SERVER_CERTIFICATE
+
 
 # Define o diretório de trabalho dentro do contêiner
 WORKDIR /app
@@ -29,7 +28,7 @@ COPY pom.xml ./
 COPY src ./src
 
 # Compila a aplicação
-RUN mvn clean install -P $SPRING_ACTIVE_PROFILE
+RUN mvn clean install
 
 # Etapa 2: Criar a imagem final para execução
 FROM openjdk:24-slim
